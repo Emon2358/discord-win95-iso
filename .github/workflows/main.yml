@@ -33,19 +33,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. ISOファイルに含めるファイルを一時的に格納するディレクトリを作成
+      # ✨✨ ここからが追加した修正部分 ✨✨
+      # 2. ISO作成ツール (genisoimage) をインストールする
+      - name: Install genisoimage
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y genisoimage
+      # ✨✨ ここまでが追加した修正部分 ✨✨
+
+      # 3. ISOファイルに含めるファイルを一時的に格納するディレクトリを作成
       - name: Create staging directory
         run: mkdir staging
 
-      # 3. リポジトリ内を再帰的に検索し、.exeと.dllファイルを見つけてstagingディレクトリにコピー
+      # 4. リポジトリ内を再帰的に検索し、.exeと.dllファイルを見つけてstagingディレクトリにコピー
       - name: Find and copy exe/dll files
         run: find . -type f \( -name "*.exe" -o -name "*.dll" \) | xargs -I {} cp {} staging/
 
-      # 4. genisoimageツールを使ってISOファイルを作成
+      # 5. genisoimageツールを使ってISOファイルを作成
       - name: Create ISO image
         run: genisoimage -o application-${{ github.event.inputs.tag }}.iso -J -R staging
 
-      # 5. 入力された情報を使って新しいリリースを作成する
+      # 6. 入力された情報を使って新しいリリースを作成する
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -60,7 +68,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # 6. 作成したISOファイルを、上記で作成した新しいリリースにアップロード
+      # 7. 作成したISOファイルを、上記で作成した新しいリリースにアップロード
       - name: Upload ISO to Release
         uses: actions/upload-release-asset@v1
         env:

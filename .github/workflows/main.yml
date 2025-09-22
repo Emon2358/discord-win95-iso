@@ -47,8 +47,6 @@ jobs:
       - name: Find and copy exe/dll files
         run: find . -type f \( -name "*.exe" -o -name "*.dll" \) | xargs -I {} cp {} staging/
 
-      # ✨✨ ここから修正箇所 ✨✨
-
       # 5. タグ名として無効な文字を置換するステップを追加
       - name: Sanitize tag name
         id: sanitize_tag
@@ -84,7 +82,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          # こちらも置換後のタグ名を使ったファイルパスを指定する
-          asset_path: ./"application-${{ steps.sanitize_tag.outputs.value }}.iso"
+          # ✨✨ ここを修正しました ✨✨
+          # ファイルパスを囲んでいたダブルクォーテーションを削除
+          asset_path: ./application-${{ steps.sanitize_tag.outputs.value }}.iso
           asset_name: application-${{ steps.sanitize_tag.outputs.value }}.iso
           asset_content_type: application/x-iso9660-image

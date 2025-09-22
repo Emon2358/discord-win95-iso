@@ -49,8 +49,8 @@ jobs:
 
       # 5. genisoimageツールを使ってISOファイルを作成
       - name: Create ISO image
-        # ✨✨ ここを修正しました ✨✨
-        run: genisoimage -o application-${{ github.event.inputs.tag }}.iso -J -R staging
+        # ファイル名にスペースが含まれる可能性を考慮し、ダブルクォーテーションで囲む
+        run: genisoimage -o "application-${{ github.event.inputs.tag }}.iso" -J -R staging
 
       # 6. 入力された情報を使って新しいリリースを作成する
       - name: Create Release
@@ -72,6 +72,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./application-${{ github.event.inputs.tag }}.iso
+          # ✨✨ ここを修正しました ✨✨
+          # 重複していた asset_path キーを一つにまとめました。
+          asset_path: ./"application-${{ github.event.inputs.tag }}.iso"
           asset_name: application-${{ github.event.inputs.tag }}.iso
           asset_content_type: application/x-iso9660-image
